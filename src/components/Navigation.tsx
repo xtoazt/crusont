@@ -38,15 +38,18 @@ export default function Navigation() {
   ]
 
   return (
-    <nav className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+    <nav className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md shadow-lg border-b border-gray-200/50 dark:border-gray-700/50 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <Link href="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <Zap className="w-5 h-5 text-white" />
+            <Link href="/" className="flex items-center space-x-3 group">
+              <div className="relative">
+                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                  <Zap className="w-6 h-6 text-white" />
+                </div>
+                <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-xl blur opacity-30 group-hover:opacity-50 transition-opacity duration-300"></div>
               </div>
-              <span className="text-xl font-bold text-gray-900 dark:text-white">
+              <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 Crusont
               </span>
             </Link>
@@ -60,10 +63,10 @@ export default function Navigation() {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className="flex items-center space-x-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  className="group flex items-center space-x-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 px-3 py-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20"
                 >
-                  <Icon className="w-4 h-4" />
-                  <span>{item.name}</span>
+                  <Icon className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                  <span className="font-medium">{item.name}</span>
                 </Link>
               )
             })}

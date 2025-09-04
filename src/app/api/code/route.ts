@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getUserFromToken } from '@/lib/auth'
-import { zukijourneyAPI, CodeGenerationRequest } from '@/lib/zukijourney'
+import { zukijourneyAPI } from '@/lib/zukijourney'
 import { prisma } from '@/lib/db'
 
 export async function POST(request: NextRequest) {

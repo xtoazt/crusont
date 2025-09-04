@@ -69,7 +69,7 @@ export default function RegisterPage() {
       } else {
         toast.error('Registration failed. Please try again.')
       }
-    } catch (error) {
+    } catch {
       toast.error('Registration failed. Please try again.')
     } finally {
       setLoading(false)
@@ -249,7 +249,7 @@ export default function RegisterPage() {
                     />
                   </div>
                   <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    Your API key will be shared with other users when you're not using it
+                    Your API key will be shared with other users when you&apos;re not using it
                   </p>
                 </div>
               )}

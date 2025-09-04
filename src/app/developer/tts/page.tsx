@@ -53,7 +53,7 @@ export default function TextToSpeechPage() {
       } else {
         toast.error('Failed to generate speech')
       }
-    } catch (error) {
+    } catch {
       toast.error('Failed to generate speech')
     } finally {
       setLoading(false)

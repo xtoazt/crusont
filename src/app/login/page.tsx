@@ -28,7 +28,7 @@ export default function LoginPage() {
       } else {
         toast.error('Invalid credentials')
       }
-    } catch (error) {
+    } catch {
       toast.error('Login failed. Please try again.')
     } finally {
       setLoading(false)

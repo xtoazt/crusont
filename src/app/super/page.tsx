@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import Navigation from '@/components/Navigation'
-import { Zap, Send, Brain, Clock, CheckCircle, AlertCircle } from 'lucide-react'
+import { Zap, Send, Brain, CheckCircle, AlertCircle, Copy, Download, Trash2, Sparkles, TrendingUp } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 interface SuperQuery {
@@ -27,23 +27,10 @@ export default function SuperPage() {
     confidence: number
     reasoning: string
   } | null>(null)
+  const [selectedModels, setSelectedModels] = useState<string[]>(['gpt-4', 'claude-3-sonnet', 'gemini-pro'])
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    if (user && token) {
-      fetchQueries()
-    }
-  }, [user, token])
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }
-
-  useEffect(() => {
-    scrollToBottom()
-  }, [currentResponse])
-
-  const fetchQueries = async () => {
+  const fetchQueries = useCallback(async () => {
     try {
       const response = await fetch('/api/super', {
         headers: {
@@ -58,7 +45,21 @@ export default function SuperPage() {
     } catch (error) {
       console.error('Failed to fetch queries:', error)
     }
+  }, [token])
+
+  useEffect(() => {
+    if (user && token) {
+      fetchQueries()
+    }
+  }, [user, token, fetchQueries])
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
+
+  useEffect(() => {
+    scrollToBottom()
+  }, [currentResponse])
 
   const sendQuery = async () => {
     if (!inputQuery.trim() || loading) return
@@ -91,7 +92,7 @@ export default function SuperPage() {
       } else {
         toast.error('Failed to process query')
       }
-    } catch (error) {
+    } catch {
       toast.error('Failed to process query')
     } finally {
       setLoading(false)
@@ -112,6 +113,71 @@ export default function SuperPage() {
       confidence: query.confidence,
       reasoning: query.reasoning,
     })
+  }
+
+  const copyResponse = async (response: string) => {
+    try {
+      await navigator.clipboard.writeText(response)
+      toast.success('Response copied to clipboard!')
+    } catch {
+      toast.error('Failed to copy response')
+    }
+  }
+
+  const downloadQueries = () => {
+    const data = {
+      queries,
+      timestamp: new Date().toISOString(),
+      user: user?.username
+    }
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `super-queries-${new Date().toISOString().split('T')[0]}.json`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+    toast.success('Queries exported!')
+  }
+
+  const deleteQuery = async (queryId: string) => {
+    if (confirm('Are you sure you want to delete this query?')) {
+      try {
+        const response = await fetch(`/api/super?id=${queryId}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        })
+
+        if (response.ok) {
+          toast.success('Query deleted successfully!')
+          fetchQueries()
+        } else {
+          toast.error('Failed to delete query')
+        }
+      } catch {
+        toast.error('Failed to delete query')
+      }
+    }
+  }
+
+  const availableModels = [
+    { id: 'gpt-4', name: 'GPT-4', description: 'Most capable model' },
+    { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo', description: 'Fast and efficient' },
+    { id: 'claude-3-sonnet', name: 'Claude 3 Sonnet', description: 'Balanced performance' },
+    { id: 'claude-3-haiku', name: 'Claude 3 Haiku', description: 'Fast and lightweight' },
+    { id: 'gemini-pro', name: 'Gemini Pro', description: 'Google\'s advanced model' },
+  ]
+
+  const toggleModel = (modelId: string) => {
+    setSelectedModels(prev => 
+      prev.includes(modelId) 
+        ? prev.filter(id => id !== modelId)
+        : [...prev, modelId]
+    )
   }
 
   if (!user) {

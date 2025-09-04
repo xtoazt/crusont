@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import Navigation from '@/components/Navigation'
-import { Code, Play, Save, FileText, Download, Upload } from 'lucide-react'
+import { Code, Play, Save, FileText, Copy, Download, Share2, Trash2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import dynamic from 'next/dynamic'
 
@@ -26,19 +26,15 @@ export default function CodePage() {
   const [currentProject, setCurrentProject] = useState<CodeProject | null>(null)
   const [prompt, setPrompt] = useState('')
   const [language, setLanguage] = useState('javascript')
-  const [framework, setFramework] = useState('')
+  const [framework] = useState('')
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [loading, setLoading] = useState(false)
   const [code, setCode] = useState('// Start coding here...\nconsole.log("Hello, World!");')
+  const [showShareModal, setShowShareModal] = useState(false)
+  const [shareUrl, setShareUrl] = useState('')
 
-  useEffect(() => {
-    if (user && token) {
-      fetchProjects()
-    }
-  }, [user, token])
-
-  const fetchProjects = async () => {
+  const fetchProjects = useCallback(async () => {
     try {
       const response = await fetch('/api/code', {
         headers: {
@@ -53,7 +49,13 @@ export default function CodePage() {
     } catch (error) {
       console.error('Failed to fetch projects:', error)
     }
-  }
+  }, [token])
+
+  useEffect(() => {
+    if (user && token) {
+      fetchProjects()
+    }
+  }, [user, token, fetchProjects])
 
   const generateCode = async () => {
     if (!prompt.trim()) {
@@ -87,7 +89,7 @@ export default function CodePage() {
       } else {
         toast.error('Failed to generate code')
       }
-    } catch (error) {
+    } catch {
       toast.error('Failed to generate code')
     } finally {
       setLoading(false)
@@ -124,7 +126,7 @@ export default function CodePage() {
       } else {
         toast.error('Failed to save project')
       }
-    } catch (error) {
+    } catch {
       toast.error('Failed to save project')
     } finally {
       setLoading(false)
@@ -145,6 +147,63 @@ export default function CodePage() {
     setTitle('')
     setDescription('')
     setPrompt('')
+  }
+
+  const copyCode = async () => {
+    try {
+      await navigator.clipboard.writeText(code)
+      toast.success('Code copied to clipboard!')
+    } catch {
+      toast.error('Failed to copy code')
+    }
+  }
+
+  const downloadCode = () => {
+    const blob = new Blob([code], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${title || 'code'}.${language}`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+    toast.success('Code downloaded!')
+  }
+
+  const shareProject = () => {
+    if (currentProject) {
+      const url = `${window.location.origin}/code?share=${currentProject.id}`
+      setShareUrl(url)
+      setShowShareModal(true)
+    } else {
+      toast.error('Please save the project first')
+    }
+  }
+
+  const deleteProject = async (projectId: string) => {
+    if (confirm('Are you sure you want to delete this project?')) {
+      try {
+        const response = await fetch(`/api/code?id=${projectId}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        })
+
+        if (response.ok) {
+          toast.success('Project deleted successfully!')
+          fetchProjects()
+          if (currentProject?.id === projectId) {
+            newProject()
+          }
+        } else {
+          toast.error('Failed to delete project')
+        }
+      } catch {
+        toast.error('Failed to delete project')
+      }
+    }
   }
 
   if (!user) {
@@ -191,19 +250,32 @@ export default function CodePage() {
                 {projects.map((project) => (
                   <div
                     key={project.id}
-                    onClick={() => loadProject(project)}
-                    className={`p-3 rounded-lg cursor-pointer transition-colors ${
+                    className={`group p-3 rounded-lg transition-all duration-200 ${
                       currentProject?.id === project.id
                         ? 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800'
                         : 'bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600'
                     }`}
                   >
-                    <h4 className="font-medium text-gray-900 dark:text-white text-sm">
-                      {project.title}
-                    </h4>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      {project.language} • {new Date(project.updatedAt).toLocaleDateString()}
-                    </p>
+                    <div 
+                      onClick={() => loadProject(project)}
+                      className="cursor-pointer"
+                    >
+                      <h4 className="font-medium text-gray-900 dark:text-white text-sm">
+                        {project.title}
+                      </h4>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        {project.language} • {new Date(project.updatedAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-end mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={() => deleteProject(project.id)}
+                        className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
+                        title="Delete project"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -223,6 +295,27 @@ export default function CodePage() {
                     </h1>
                   </div>
                   <div className="flex items-center space-x-2">
+                    <button
+                      onClick={copyCode}
+                      className="flex items-center space-x-2 px-3 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-md transition-colors"
+                      title="Copy code"
+                    >
+                      <Copy className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={downloadCode}
+                      className="flex items-center space-x-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+                      title="Download code"
+                    >
+                      <Download className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={shareProject}
+                      className="flex items-center space-x-2 px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md transition-colors"
+                      title="Share project"
+                    >
+                      <Share2 className="w-4 h-4" />
+                    </button>
                     <button
                       onClick={saveProject}
                       disabled={loading}
@@ -329,6 +422,49 @@ export default function CodePage() {
           </div>
         </div>
       </div>
+
+      {/* Share Modal */}
+      {showShareModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              Share Project
+            </h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Share URL
+                </label>
+                <div className="flex">
+                  <input
+                    type="text"
+                    value={shareUrl}
+                    readOnly
+                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-l-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                  />
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(shareUrl)
+                      toast.success('URL copied to clipboard!')
+                    }}
+                    className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-r-md transition-colors"
+                  >
+                    <Copy className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+              <div className="flex justify-end space-x-2">
+                <button
+                  onClick={() => setShowShareModal(false)}
+                  className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

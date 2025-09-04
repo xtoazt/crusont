@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getUserFromToken } from '@/lib/auth'
-import { zukijourneyAPI, EmbeddingRequest } from '@/lib/zukijourney'
+import { zukijourneyAPI } from '@/lib/zukijourney'
 
 export async function POST(request: NextRequest) {
   try {

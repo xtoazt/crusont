@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { getAvailableApiKey, releaseApiKey } from './auth'
+import { getAvailableApiKey } from './auth'
 
 const ZUKIJOURNEY_API_URL = process.env.ZUKIJOURNEY_API_URL || 'https://api.zukijourney.com'
 
@@ -108,7 +108,7 @@ export interface TranslationResponse {
 }
 
 class ZukijourneyAPI {
-  private async makeRequest(endpoint: string, data: any, apiKey?: string): Promise<any> {
+  private async makeRequest(endpoint: string, data: unknown, apiKey?: string): Promise<unknown> {
     const key = apiKey || await getAvailableApiKey()
     if (!key) {
       throw new Error('No API key available')
@@ -136,7 +136,7 @@ class ZukijourneyAPI {
       model: 'gpt-4',
       max_tokens: 2000,
       temperature: 0.7,
-    }, apiKey)
+    }, apiKey) as Promise<ChatResponse>
   }
 
   async generateCode(request: CodeGenerationRequest, apiKey?: string): Promise<CodeGenerationResponse> {
@@ -144,7 +144,7 @@ class ZukijourneyAPI {
       prompt: request.prompt,
       language: request.language || 'javascript',
       framework: request.framework,
-    }, apiKey)
+    }, apiKey) as Promise<CodeGenerationResponse>
   }
 
   async superQuery(request: SuperQueryRequest, apiKey?: string): Promise<SuperQueryResponse> {
@@ -165,8 +165,8 @@ class ZukijourneyAPI {
     )
 
     const successfulResponses = responses
-      .filter((result): result is PromiseFulfilledResult<any> => result.status === 'fulfilled')
-      .map(result => result.value)
+      .filter((result): result is PromiseFulfilledResult<unknown> => result.status === 'fulfilled')
+      .map(result => result.value as { choices: Array<{ message: { content: string } }>, model?: string })
 
     if (successfulResponses.length === 0) {
       throw new Error('All models failed to respond')
@@ -174,7 +174,7 @@ class ZukijourneyAPI {
 
     // Combine responses (simplified approach - in production, you might want more sophisticated combination)
     const combinedResponse = successfulResponses
-      .map(r => r.choices[0].message.content)
+      .map(r => r.choices[0]?.message.content || '')
       .join('\n\n---\n\n')
 
     return {
@@ -186,13 +186,18 @@ class ZukijourneyAPI {
   }
 
   async textToSpeech(request: TextToSpeechRequest, apiKey?: string): Promise<ArrayBuffer> {
+    const key = apiKey || await getAvailableApiKey()
+    if (!key) {
+      throw new Error('No API key available')
+    }
+
     const response = await axios.post(`${ZUKIJOURNEY_API_URL}/v1/audio/speech`, {
       text: request.text,
       voice: request.voice || 'alloy',
       speed: request.speed || 1.0,
     }, {
       headers: {
-        'Authorization': `Bearer ${apiKey || await getAvailableApiKey()}`,
+        'Authorization': `Bearer ${key}`,
         'Content-Type': 'application/json',
       },
       responseType: 'arraybuffer',
@@ -205,20 +210,20 @@ class ZukijourneyAPI {
     return this.makeRequest('/v1/embeddings', {
       input: request.text,
       model: request.model || 'text-embedding-ada-002',
-    }, apiKey)
+    }, apiKey) as Promise<EmbeddingResponse>
   }
 
   async moderate(request: ModerationRequest, apiKey?: string): Promise<ModerationResponse> {
     return this.makeRequest('/v1/moderations', {
       input: request.text,
-    }, apiKey)
+    }, apiKey) as Promise<ModerationResponse>
   }
 
   async upscaleImage(request: ImageUpscaleRequest, apiKey?: string): Promise<ImageUpscaleResponse> {
     return this.makeRequest('/v1/images/upscale', {
       image: request.image,
       scale: request.scale || 2,
-    }, apiKey)
+    }, apiKey) as Promise<ImageUpscaleResponse>
   }
 
   async translate(request: TranslationRequest, apiKey?: string): Promise<TranslationResponse> {
@@ -226,7 +231,7 @@ class ZukijourneyAPI {
       text: request.text,
       target_language: request.target_language,
       source_language: request.source_language,
-    }, apiKey)
+    }, apiKey) as Promise<TranslationResponse>
   }
 }
 
