@@ -21,8 +21,8 @@ JWT_SECRET=your-jwt-secret-here
 
 ### Build Configuration
 The project is configured with:
-- `vercel.json` for proper Prisma handling
-- `postinstall` script to generate Prisma client
+- `vercel.json` with simplified build command
+- `postinstall` script to generate Prisma client automatically
 - Build script includes `prisma generate`
 
 ### Deployment Steps
