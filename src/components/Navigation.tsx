@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
-import { Menu, X, Zap, Code, MessageSquare, Sparkles, ChevronDown, LogOut, User } from 'lucide-react'
+import { Menu, X, Zap, Code, MessageSquare, Sparkles, ChevronDown, LogOut, User, Star } from 'lucide-react'
 
 export default function Navigation() {
   const { user, logout } = useAuth()
@@ -16,15 +16,18 @@ export default function Navigation() {
   }
 
   return (
-    <nav className="bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <nav className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-              <Zap className="w-5 h-5 text-white" />
+          <Link href="/" className="flex items-center space-x-3 group">
+            <div className="relative">
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                <Zap className="w-6 h-6 text-white" />
+              </div>
+              <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-xl blur opacity-30 group-hover:opacity-50 transition-opacity duration-300"></div>
             </div>
-            <span className="text-xl font-bold text-gray-900 dark:text-white">
+            <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               Crusont
             </span>
           </Link>
@@ -33,24 +36,24 @@ export default function Navigation() {
           <div className="hidden md:flex items-center space-x-8">
             <Link
               href="/code"
-              className="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+              className="group flex items-center space-x-2 px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all duration-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
             >
-              <Code className="w-4 h-4" />
-              <span>Code</span>
+              <Code className="w-4 h-4 group-hover:scale-110 transition-transform" />
+              <span className="font-medium">Code</span>
             </Link>
             <Link
               href="/chat"
-              className="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+              className="group flex items-center space-x-2 px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all duration-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
             >
-              <MessageSquare className="w-4 h-4" />
-              <span>Chat</span>
+              <MessageSquare className="w-4 h-4 group-hover:scale-110 transition-transform" />
+              <span className="font-medium">Chat</span>
             </Link>
             <Link
               href="/super"
-              className="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+              className="group flex items-center space-x-2 px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all duration-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
             >
-              <Sparkles className="w-4 h-4" />
-              <span>Super</span>
+              <Sparkles className="w-4 h-4 group-hover:scale-110 transition-transform" />
+              <span className="font-medium">Super</span>
             </Link>
 
             {/* Developer Menu */}
@@ -58,49 +61,55 @@ export default function Navigation() {
               <div className="relative">
                 <button
                   onClick={() => setIsDeveloperMenuOpen(!isDeveloperMenuOpen)}
-                  className="flex items-center space-x-1 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+                  className="group flex items-center space-x-1 px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all duration-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
                 >
-                  <span>Developer</span>
-                  <ChevronDown className="w-4 h-4" />
+                  <Star className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                  <span className="font-medium">Developer</span>
+                  <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isDeveloperMenuOpen ? 'rotate-180' : ''}`} />
                 </button>
                 
                 {isDeveloperMenuOpen && (
-                  <div className="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow-lg z-50">
+                  <div className="absolute top-full left-0 mt-2 w-56 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl z-50 overflow-hidden">
                     <div className="py-2">
                       <Link
                         href="/developer/tts"
-                        className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                        className="flex items-center space-x-3 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                         onClick={() => setIsDeveloperMenuOpen(false)}
                       >
-                        Text to Speech
+                        <span className="text-lg">🎤</span>
+                        <span>Text to Speech</span>
                       </Link>
                       <Link
                         href="/developer/translate"
-                        className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                        className="flex items-center space-x-3 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                         onClick={() => setIsDeveloperMenuOpen(false)}
                       >
-                        Translation
+                        <span className="text-lg">🌍</span>
+                        <span>Translation</span>
                       </Link>
                       <Link
                         href="/developer/upscale"
-                        className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                        className="flex items-center space-x-3 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                         onClick={() => setIsDeveloperMenuOpen(false)}
                       >
-                        Image Upscaling
+                        <span className="text-lg">🖼️</span>
+                        <span>Image Upscaling</span>
                       </Link>
                       <Link
                         href="/developer/moderate"
-                        className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                        className="flex items-center space-x-3 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                         onClick={() => setIsDeveloperMenuOpen(false)}
                       >
-                        Content Moderation
+                        <span className="text-lg">🛡️</span>
+                        <span>Content Moderation</span>
                       </Link>
                       <Link
                         href="/developer/embeddings"
-                        className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                        className="flex items-center space-x-3 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                         onClick={() => setIsDeveloperMenuOpen(false)}
                       >
-                        Embeddings
+                        <span className="text-lg">🧠</span>
+                        <span>Embeddings</span>
                       </Link>
                     </div>
                   </div>
@@ -111,28 +120,33 @@ export default function Navigation() {
             {/* User Menu */}
             {user ? (
               <div className="flex items-center space-x-4">
-                <span className="text-sm text-gray-600 dark:text-gray-300">
-                  {user.username}
-                </span>
+                <div className="flex items-center space-x-2 px-3 py-2 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                  <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                    <User className="w-3 h-3 text-white" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {user.username}
+                  </span>
+                </div>
                 <button
                   onClick={handleLogout}
-                  className="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+                  className="flex items-center space-x-2 px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 transition-all duration-300 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20"
                 >
                   <LogOut className="w-4 h-4" />
-                  <span>Logout</span>
+                  <span className="font-medium">Logout</span>
                 </button>
               </div>
             ) : (
               <div className="flex items-center space-x-4">
                 <Link
                   href="/login"
-                  className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+                  className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium"
                 >
                   Sign In
                 </Link>
                 <Link
                   href="/register"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
                 >
                   Get Started
                 </Link>
@@ -144,7 +158,7 @@ export default function Navigation() {
           <div className="md:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+              className="p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
             >
               {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -153,101 +167,111 @@ export default function Navigation() {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden border-t border-gray-200 dark:border-gray-800">
-            <div className="py-4 space-y-4">
+          <div className="md:hidden border-t border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md">
+            <div className="py-4 space-y-2">
               <Link
                 href="/code"
-                className="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+                className="flex items-center space-x-3 px-4 py-3 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors rounded-lg mx-2"
                 onClick={() => setIsMenuOpen(false)}
               >
-                <Code className="w-4 h-4" />
-                <span>Code</span>
+                <Code className="w-5 h-5" />
+                <span className="font-medium">Code</span>
               </Link>
               <Link
                 href="/chat"
-                className="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+                className="flex items-center space-x-3 px-4 py-3 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors rounded-lg mx-2"
                 onClick={() => setIsMenuOpen(false)}
               >
-                <MessageSquare className="w-4 h-4" />
-                <span>Chat</span>
+                <MessageSquare className="w-5 h-5" />
+                <span className="font-medium">Chat</span>
               </Link>
               <Link
                 href="/super"
-                className="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+                className="flex items-center space-x-3 px-4 py-3 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors rounded-lg mx-2"
                 onClick={() => setIsMenuOpen(false)}
               >
-                <Sparkles className="w-4 h-4" />
-                <span>Super</span>
+                <Sparkles className="w-5 h-5" />
+                <span className="font-medium">Super</span>
               </Link>
 
               {/* Developer Links */}
               {user?.accountType === 'DEVELOPER' && (
-                <div className="pl-6 space-y-2">
+                <div className="px-2">
+                  <div className="px-4 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Developer Tools
+                  </div>
                   <Link
                     href="/developer/tts"
-                    className="block text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+                    className="flex items-center space-x-3 px-4 py-3 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors rounded-lg"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    Text to Speech
+                    <span className="text-lg">🎤</span>
+                    <span>Text to Speech</span>
                   </Link>
                   <Link
                     href="/developer/translate"
-                    className="block text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+                    className="flex items-center space-x-3 px-4 py-3 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors rounded-lg"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    Translation
+                    <span className="text-lg">🌍</span>
+                    <span>Translation</span>
                   </Link>
                   <Link
                     href="/developer/upscale"
-                    className="block text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+                    className="flex items-center space-x-3 px-4 py-3 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors rounded-lg"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    Image Upscaling
+                    <span className="text-lg">🖼️</span>
+                    <span>Image Upscaling</span>
                   </Link>
                   <Link
                     href="/developer/moderate"
-                    className="block text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+                    className="flex items-center space-x-3 px-4 py-3 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors rounded-lg"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    Content Moderation
+                    <span className="text-lg">🛡️</span>
+                    <span>Content Moderation</span>
                   </Link>
                   <Link
                     href="/developer/embeddings"
-                    className="block text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+                    className="flex items-center space-x-3 px-4 py-3 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors rounded-lg"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    Embeddings
+                    <span className="text-lg">🧠</span>
+                    <span>Embeddings</span>
                   </Link>
                 </div>
               )}
 
               {/* User Actions */}
               {user ? (
-                <div className="pt-4 border-t border-gray-200 dark:border-gray-800">
-                  <div className="flex items-center space-x-2 mb-4">
-                    <User className="w-4 h-4 text-gray-600 dark:text-gray-300" />
-                    <span className="text-gray-600 dark:text-gray-300">{user.username}</span>
+                <div className="pt-4 border-t border-gray-200 dark:border-gray-700 mx-2">
+                  <div className="flex items-center space-x-3 px-4 py-3 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg border border-blue-200 dark:border-blue-800 mb-4">
+                    <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                      <User className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="font-medium text-gray-700 dark:text-gray-300">{user.username}</span>
                   </div>
                   <button
                     onClick={handleLogout}
-                    className="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+                    className="flex items-center space-x-3 px-4 py-3 text-gray-600 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors rounded-lg w-full"
                   >
-                    <LogOut className="w-4 h-4" />
-                    <span>Logout</span>
+                    <LogOut className="w-5 h-5" />
+                    <span className="font-medium">Logout</span>
                   </button>
                 </div>
               ) : (
-                <div className="pt-4 border-t border-gray-200 dark:border-gray-800 space-y-2">
+                <div className="pt-4 border-t border-gray-200 dark:border-gray-700 mx-2 space-y-2">
                   <Link
                     href="/login"
-                    className="block text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+                    className="block px-4 py-3 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors rounded-lg font-medium"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Sign In
                   </Link>
                   <Link
                     href="/register"
-                    className="block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-center"
+                    className="block px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 text-center font-medium"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Get Started
