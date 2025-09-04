@@ -4,15 +4,18 @@ import { AccountType } from '@prisma/client'
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, username, password, accountType, apiKey } = await request.json()
+    const { username, password, accountType, apiKey } = await request.json()
 
     // Validate required fields
-    if (!email || !username || !password) {
+    if (!username || !password) {
       return NextResponse.json(
-        { error: 'Email, username, and password are required' },
+        { error: 'Username and password are required' },
         { status: 400 }
       )
     }
+
+    // Generate internal email
+    const email = `${username}@crusont.internal`
 
     // Validate account type
     if (accountType && !Object.values(AccountType).includes(accountType)) {

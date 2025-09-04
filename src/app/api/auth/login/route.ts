@@ -3,16 +3,18 @@ import { authenticateUser } from '@/lib/auth'
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password } = await request.json()
+    const { username, password } = await request.json()
 
     // Validate required fields
-    if (!email || !password) {
+    if (!username || !password) {
       return NextResponse.json(
-        { error: 'Email and password are required' },
+        { error: 'Username and password are required' },
         { status: 400 }
       )
     }
 
+    // Convert username to internal email
+    const email = `${username}@crusont.internal`
     const result = await authenticateUser(email, password)
 
     if (!result) {

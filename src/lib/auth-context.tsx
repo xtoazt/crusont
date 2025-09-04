@@ -6,8 +6,8 @@ import { User } from './auth'
 interface AuthContextType {
   user: User | null
   token: string | null
-  login: (email: string, password: string) => Promise<boolean>
-  register: (email: string, username: string, password: string, accountType: 'USER' | 'DEVELOPER', apiKey?: string) => Promise<boolean>
+  login: (username: string, password: string) => Promise<boolean>
+  register: (username: string, password: string, accountType: 'USER' | 'DEVELOPER', apiKey?: string) => Promise<boolean>
   logout: () => void
   loading: boolean
 }
@@ -55,14 +55,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (username: string, password: string): Promise<boolean> => {
     try {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ username, password }),
       })
 
       if (response.ok) {
@@ -80,7 +80,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const register = async (
-    email: string,
     username: string,
     password: string,
     accountType: 'USER' | 'DEVELOPER',
@@ -92,7 +91,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, username, password, accountType, apiKey }),
+        body: JSON.stringify({ username, password, accountType, apiKey }),
       })
 
       if (response.ok) {
